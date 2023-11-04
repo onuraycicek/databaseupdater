@@ -47,7 +47,7 @@ class BaseManager
     public function callArtisan($command)
     {
         Artisan::call($command, [
-            "--force" => true,
+            '--force' => true,
         ]);
         $artisanOutput = Artisan::output();
         if (in_array('Error', str_split($artisanOutput, 5))) {
