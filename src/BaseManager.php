@@ -46,7 +46,9 @@ class BaseManager
 
     public function callArtisan($command)
     {
-        Artisan::call($command);
+        Artisan::call($command, [
+            "--force" => true,
+        ]);
         $artisanOutput = Artisan::output();
         if (in_array('Error', str_split($artisanOutput, 5))) {
             $this->addProcess([
