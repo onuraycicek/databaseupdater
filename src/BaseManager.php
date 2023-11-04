@@ -50,7 +50,7 @@ class BaseManager
         if (strpos($command, 'migrate') !== false) {
             $options = ['--force' => true];
         }
-        Artisan::call($command,$options);
+        Artisan::call($command, $options);
         $artisanOutput = Artisan::output();
         if (in_array('Error', str_split($artisanOutput, 5))) {
             $this->addProcess([
