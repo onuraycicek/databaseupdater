@@ -13,7 +13,7 @@ class DatabaseUpdaterResponseComponent extends Component
 
     public function render(): View
     {
-        return view("databaseupdater::components.database-updater-response");
+        return view('databaseupdater::components.database-updater-response');
     }
 
     public function hasField(string $field): bool

@@ -2,9 +2,6 @@
 
 namespace Onuraycicek\DatabaseUpdater;
 
-use Onuraycicek\DatabaseUpdater\DatabaseManager;
-use Onuraycicek\DatabaseUpdater\DatabaseMigrationManager;
-use Onuraycicek\DatabaseUpdater\DatabaseBackup;
 use Illuminate\Support\Facades\Log;
 
 class DatabaseUpdater extends BaseManager
@@ -42,7 +39,7 @@ class DatabaseUpdater extends BaseManager
      *
      * @return void
      */
-    public function __construct($dbName = null,$allValueIsNullable= false)
+    public function __construct($dbName = null, $allValueIsNullable = false)
     {
         if (is_null($dbName)) {
             $dbName = env('DB_DATABASE');
@@ -50,7 +47,7 @@ class DatabaseUpdater extends BaseManager
 
         $this->dbName = $dbName;
         $this->databaseManager = new DatabaseManager($dbName);
-        $this->databaseMigrationManager = new DatabaseMigrationManager($dbName,$allValueIsNullable);
+        $this->databaseMigrationManager = new DatabaseMigrationManager($dbName, $allValueIsNullable);
         $this->databaseBackup = new DatabaseBackup;
     }
 
@@ -166,8 +163,8 @@ class DatabaseUpdater extends BaseManager
             $this->databaseMigrationManager->deleteNewMigrationFiles();
             // remove new migration tables
             $this->databaseMigrationManager->deleteNewMigrationTables();
-            $backupFilePath=$this->databaseBackup->create();
-  
+            $backupFilePath = $this->databaseBackup->create();
+
             $dbName = $this->dbName;
             //check table differences
             //check if all tables inserted in migration table
@@ -252,6 +249,7 @@ class DatabaseUpdater extends BaseManager
                 'changes' => $diffColumns,
             ]);
             $this->databaseManager->maintanceOff();
+
             return [
                 'status' => 'success',
                 'processes' => $processes,

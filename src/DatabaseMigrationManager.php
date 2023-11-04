@@ -2,16 +2,18 @@
 
 namespace Onuraycicek\DatabaseUpdater;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseMigrationManager extends BaseManager
 {
     private $dbName;
+
     private $migrationPath;
 
     private $newMigrationPath;
+
     private $newBaseMigrationPath;
 
     private $newMigrationStructure;
@@ -26,7 +28,7 @@ class DatabaseMigrationManager extends BaseManager
             $migrationPath = database_path('migrations');
         }
         $newBaseMigrationPath = 'database/migrations/new';
-        $this->newMigrationPath = $migrationPath . '/new';
+        $this->newMigrationPath = $migrationPath.'/new';
         $this->setMigrationPath($migrationPath);
         $this->newBaseMigrationPath = $newBaseMigrationPath;
         $this->dbName = $dbName;
@@ -81,8 +83,8 @@ class DatabaseMigrationManager extends BaseManager
                 continue;
             }
             try {
-                $fileContent = file_get_contents($migrationPath . '/' . $file);
-                if (strpos($file, '.php') !== false && (!$filtered || $this->checkFileContent($fileContent, $file))) {
+                $fileContent = file_get_contents($migrationPath.'/'.$file);
+                if (strpos($file, '.php') !== false && (! $filtered || $this->checkFileContent($fileContent, $file))) {
                     $migrationFiles[] = $file;
                 }
             } catch (\Exception $e) {
@@ -101,7 +103,7 @@ class DatabaseMigrationManager extends BaseManager
         $migrationTables = [];
         $migrationPath = $this->getMigrationPath();
         foreach ($migrationFiles as $file) {
-            $fileContent = file_get_contents($migrationPath . '/' . $file);
+            $fileContent = file_get_contents($migrationPath.'/'.$file);
             $fileContentHasNotExclusive = $this->checkFileContent($fileContent, $file);
             preg_match('/Schema::create\(\'(.*?)\'/', $fileContent, $matches);
             if (count($matches) > 0 && $fileContentHasNotExclusive) {
@@ -114,6 +116,7 @@ class DatabaseMigrationManager extends BaseManager
                 ]);
             }
         }
+
         return $migrationTables;
     }
 
@@ -130,7 +133,7 @@ class DatabaseMigrationManager extends BaseManager
         $migrationFiles = $this->getMigrationFiles();
         $migrationTablesAndFiles = [];
         foreach ($migrationFiles as $file) {
-            $readFile = file_get_contents($this->getMigrationPath() . '/' . $file);
+            $readFile = file_get_contents($this->getMigrationPath().'/'.$file);
             preg_match('/Schema::create\(\'(.*?)\'/', $readFile, $matches);
 
             if (empty($matches)) {
@@ -157,33 +160,33 @@ class DatabaseMigrationManager extends BaseManager
     {
         $newMigrationPath = $this->getNewMigrationPath();
 
-        if (!file_exists($newMigrationPath)) {
+        if (! file_exists($newMigrationPath)) {
             mkdir($newMigrationPath, 0777, true);
         }
 
         $migrationTablesAndFiles = $this->getMigrationTablesAndFiles();
         foreach ($migrationTablesAndFiles as $data) {
             try {
-                $newFileName = str_replace('_table.php', $this->tableNameSuffix . '_table.php', $data['file_name']);
-                $newFilePath = $newMigrationPath . '/' . $newFileName;
-                $oldFilePath = $this->getMigrationPath() . '/' . $data['file_name'];
+                $newFileName = str_replace('_table.php', $this->tableNameSuffix.'_table.php', $data['file_name']);
+                $newFilePath = $newMigrationPath.'/'.$newFileName;
+                $oldFilePath = $this->getMigrationPath().'/'.$data['file_name'];
                 $oldFileContent = file_get_contents($oldFilePath);
                 $newFileContent = $oldFileContent;
-                $newFileContent = preg_replace('/Schema::table\(\'(.*?)\'/', 'Schema::table(\'$1' . $this->tableNameSuffix . '\'', $newFileContent);
+                $newFileContent = preg_replace('/Schema::table\(\'(.*?)\'/', 'Schema::table(\'$1'.$this->tableNameSuffix.'\'', $newFileContent);
                 if ($data['table_name']) {
-                    $newFileContent = str_replace('Schema::create(\'' . $data['table_name'] . '\'', 'Schema::create(\'' . $data['table_name'] . '' . $this->tableNameSuffix . '\'', $oldFileContent);
-                    $newFileContent = str_replace('Schema::dropIfExists(\'' . $data['table_name'] . '\'', 'Schema::dropIfExists(\'' . $data['table_name'] . '' . $this->tableNameSuffix . '\'', $newFileContent);
-                    $newFileContent = str_replace('Schema::drop(\'' . $data['table_name'] . '\'', 'Schema::drop(\'' . $data['table_name'] . '' . $this->tableNameSuffix . '\'', $newFileContent);
+                    $newFileContent = str_replace('Schema::create(\''.$data['table_name'].'\'', 'Schema::create(\''.$data['table_name'].''.$this->tableNameSuffix.'\'', $oldFileContent);
+                    $newFileContent = str_replace('Schema::dropIfExists(\''.$data['table_name'].'\'', 'Schema::dropIfExists(\''.$data['table_name'].''.$this->tableNameSuffix.'\'', $newFileContent);
+                    $newFileContent = str_replace('Schema::drop(\''.$data['table_name'].'\'', 'Schema::drop(\''.$data['table_name'].''.$this->tableNameSuffix.'\'', $newFileContent);
 
-                    $newFileContent = str_replace('DB::table(\'' . $data['table_name'] . '\'', 'DB::table(\'' . $data['table_name'] . '' . $this->tableNameSuffix . '\'', $newFileContent);
+                    $newFileContent = str_replace('DB::table(\''.$data['table_name'].'\'', 'DB::table(\''.$data['table_name'].''.$this->tableNameSuffix.'\'', $newFileContent);
 
-                    $newFileContent = str_replace('$this->schema->create(\'' . $data['table_name'] . '\'', '$this->schema->create(\'' . $data['table_name'] . '' . $this->tableNameSuffix . '\'', $newFileContent);
-                    $newFileContent = str_replace('$this->schema->dropIfExists(\'' . $data['table_name'] . '\'', '$this->schema->dropIfExists(\'' . $data['table_name'] . '' . $this->tableNameSuffix . '\'', $newFileContent);
-                    $newFileContent = str_replace('$this->schema->drop(\'' . $data['table_name'] . '\'', '$this->schema->drop(\'' . $data['table_name'] . '' . $this->tableNameSuffix . '\'', $newFileContent);
+                    $newFileContent = str_replace('$this->schema->create(\''.$data['table_name'].'\'', '$this->schema->create(\''.$data['table_name'].''.$this->tableNameSuffix.'\'', $newFileContent);
+                    $newFileContent = str_replace('$this->schema->dropIfExists(\''.$data['table_name'].'\'', '$this->schema->dropIfExists(\''.$data['table_name'].''.$this->tableNameSuffix.'\'', $newFileContent);
+                    $newFileContent = str_replace('$this->schema->drop(\''.$data['table_name'].'\'', '$this->schema->drop(\''.$data['table_name'].''.$this->tableNameSuffix.'\'', $newFileContent);
                 }
 
                 $suffixToClassName = str_replace('_', '', $this->tableNameSuffix);
-                $newFileContent = str_replace('Table extends Migration', $suffixToClassName . 'Table extends Migration', $newFileContent);
+                $newFileContent = str_replace('Table extends Migration', $suffixToClassName.'Table extends Migration', $newFileContent);
                 file_put_contents($newFilePath, $newFileContent);
             } catch (\Throwable $th) {
                 return response()->json([
@@ -202,13 +205,13 @@ class DatabaseMigrationManager extends BaseManager
             'reason' => 'Deleting new migration files',
         ]);
         $newMigrationPath = $this->getNewMigrationPath();
-        if (!file_exists($newMigrationPath)) {
+        if (! file_exists($newMigrationPath)) {
             return;
         }
         $files = scandir($newMigrationPath);
         foreach ($files as $file) {
-            if (strpos($file, '.php') !== false && file_exists($newMigrationPath . '/' . $file)) {
-                unlink($newMigrationPath . '/' . $file);
+            if (strpos($file, '.php') !== false && file_exists($newMigrationPath.'/'.$file)) {
+                unlink($newMigrationPath.'/'.$file);
             }
         }
 
@@ -217,11 +220,10 @@ class DatabaseMigrationManager extends BaseManager
         }
     }
 
-
     private function getDbTables()
     {
         $tables = DB::select('SHOW TABLES');
-        $dbName = 'Tables_in_' . $this->dbName;
+        $dbName = 'Tables_in_'.$this->dbName;
         $tables = array_map(function ($table) use ($dbName) {
             return $table->$dbName;
         }, $tables);
@@ -245,7 +247,7 @@ class DatabaseMigrationManager extends BaseManager
 
         // delete all tables
         foreach ($newMigrationTables as $table) {
-            DB::statement('DROP TABLE IF EXISTS `' . $table . '`');
+            DB::statement('DROP TABLE IF EXISTS `'.$table.'`');
         }
     }
 
@@ -261,7 +263,7 @@ class DatabaseMigrationManager extends BaseManager
                 'type' => $column->getType()->getName(),
                 'length' => $column->getLength(),
                 'unsigned' => $column->getUnsigned(),
-                'nullable' => !$column->getNotnull(),
+                'nullable' => ! $column->getNotnull(),
                 'default' => $column->getDefault(),
                 'autoincrement' => $column->getAutoincrement(),
                 'comment' => $column->getComment(),
@@ -274,7 +276,7 @@ class DatabaseMigrationManager extends BaseManager
     private function migrateNewMigrationFiles()
     {
         $newMigrationPath = $this->getNewBaseMigrationPath();
-        $migrateCommand = 'migrate --path=' . $newMigrationPath;
+        $migrateCommand = 'migrate --path='.$newMigrationPath;
         $this->addProcess([
             'status' => 'info',
             'reason' => 'Migrating new migration files',
@@ -286,10 +288,10 @@ class DatabaseMigrationManager extends BaseManager
     private function rollbackNewMigrationFiles()
     {
         $newMigrationPath = $this->getNewBaseMigrationPath();
-        $migrateCommand = 'migrate:rollback --path=' . $newMigrationPath;
+        $migrateCommand = 'migrate:rollback --path='.$newMigrationPath;
         $this->addProcess([
             'status' => 'info',
-            'reason' => 'Rollback new migration files ' . $newMigrationPath,
+            'reason' => 'Rollback new migration files '.$newMigrationPath,
             'command' => $migrateCommand,
         ]);
         $this->callArtisan($migrateCommand);
@@ -309,7 +311,7 @@ class DatabaseMigrationManager extends BaseManager
         $newMigrationStructure = [];
         $newMigrationTables = $this->getMigrationTables();
         foreach ($newMigrationTables as $table_name) {
-            $columns = $this->getMigrationColumns($table_name . $this->tableNameSuffix);
+            $columns = $this->getMigrationColumns($table_name.$this->tableNameSuffix);
             $newMigrationStructure[$table_name] = $columns;
         }
         $this->newMigrationStructure = $newMigrationStructure;
@@ -320,14 +322,13 @@ class DatabaseMigrationManager extends BaseManager
         return $newMigrationStructure;
     }
 
-
     public function migrate($tables = null)
     {
         $this->callArtisan('migrate');
         $this->addProcess([
             'status' => 'success',
             'reason' => 'Migration success',
-            'tables' => $tables ?? []
+            'tables' => $tables ?? [],
         ]);
     }
 
@@ -354,13 +355,12 @@ class DatabaseMigrationManager extends BaseManager
     {
         $this->addProcess([
             'status' => 'info',
-            'reason' => 'Removing column ' . $columnName . ' from table ' . $tableName,
+            'reason' => 'Removing column '.$columnName.' from table '.$tableName,
         ]);
         Schema::table($tableName, function (Blueprint $table) use ($columnName) {
             $table->dropColumn($columnName);
         });
     }
-
 
     public function checkMigrationTableMattchCurrenctStatus()
     {
@@ -387,18 +387,18 @@ class DatabaseMigrationManager extends BaseManager
                 ]);
                 $this->addProcess([
                     'status' => 'info',
-                    'reason' =>  'Migration table not match current status',
-                    'info' => 'Migration table has ' . $fileName . ' and ' . $tableName . ' table',
+                    'reason' => 'Migration table not match current status',
+                    'info' => 'Migration table has '.$fileName.' and '.$tableName.' table',
                     'values' => [
                         'count($check)' => count($check),
-                        'Schema::hasTable($tableName)' => Schema::hasTable($tableName) ? 'true' : 'false'
-                    ]
+                        'Schema::hasTable($tableName)' => Schema::hasTable($tableName) ? 'true' : 'false',
+                    ],
                 ]);
             } else {
                 $this->addProcess([
                     'status' => 'info',
                     'reason' => 'Migration table match current status',
-                    'info' => 'Migration table has ' . $fileName . ' and ' . $tableName . ' table',
+                    'info' => 'Migration table has '.$fileName.' and '.$tableName.' table',
                     'val' => $check,
                     'val2' => Schema::hasTable($tableName) ? 'true' : 'false',
                 ]);
