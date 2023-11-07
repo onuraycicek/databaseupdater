@@ -256,7 +256,6 @@ class DatabaseUpdater extends BaseManager
                 'changes' => $diffColumns,
             ];
         } catch (\Exception $e) {
-            dd($e);
             // remove new migration files
             $this->databaseMigrationManager->deleteNewMigrationFiles();
             // remove new migration tables

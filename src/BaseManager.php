@@ -48,9 +48,11 @@ class BaseManager
     {
         $options = [];
         if (strpos($command, 'migrate') !== false) {
-            $options = ['--force' => true];
+            $options = ['--force'];
         }
-        Artisan::call($command,$options);
+        $command .= ' ' . implode(' ', $options);
+        
+        Artisan::call($command);
         $artisanOutput = Artisan::output();
         if (in_array('Error', str_split($artisanOutput, 5))) {
             $this->addProcess([
