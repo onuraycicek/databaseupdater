@@ -50,8 +50,8 @@ class BaseManager
         if (strpos($command, 'migrate') !== false) {
             $options = ['--force'];
         }
-        $command .= ' ' . implode(' ', $options);
-        
+        $command .= ' '.implode(' ', $options);
+
         Artisan::call($command);
         $artisanOutput = Artisan::output();
         if (in_array('Error', str_split($artisanOutput, 5))) {
